@@ -1,0 +1,204 @@
+# File: app.py
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+
+# Initialize Flask app
+app = Flask(__name__)
+
+# Database configuration
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://username:password@localhost/monopoly_web'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Initialize database and migrations
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
+
+# Import models (used for migrations)
+from models.player import Player
+from models.property import Property
+from models.auction import Auction
+from models.trade import Trade
+from models.card import Card
+from models.game_state import GameState
+from models.game import Game
+
+# Import routes
+from routes.player_routes import player_routes
+from routes.property_routes import property_routes
+from routes.auction_routes import auction_routes
+from routes.trade_routes import trade_routes
+from routes.card_routes import card_routes
+from routes.game_routes import game_routes
+
+# Register routes
+app.register_blueprint(player_routes, url_prefix='/api/players')
+app.register_blueprint(property_routes, url_prefix='/api/properties')
+app.register_blueprint(auction_routes, url_prefix='/api/auctions')
+app.register_blueprint(trade_routes, url_prefix='/api/trades')
+app.register_blueprint(card_routes, url_prefix='/api/cards')
+app.register_blueprint(game_routes, url_prefix='/api/game')
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+# File: models/player.py
+from app import db
+
+class Player(db.Model):
+    __tablename__ = 'players'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    color = db.Column(db.String(50), nullable=False)
+    position = db.Column(db.Integer, default=0)
+    money = db.Column(db.Numeric(10, 2), default=1500.00)
+    creditor = db.Column(db.Integer, db.ForeignKey('players.id'), nullable=True)
+    jail = db.Column(db.Boolean, default=False)
+    jail_roll = db.Column(db.Integer, default=0)
+    community_chest_card = db.Column(db.Boolean, default=False)
+    chance_card = db.Column(db.Boolean, default=False)
+
+    def pay(self, amount):
+        if self.money >= amount:
+            self.money -= amount
+            return True
+        else:
+            return False
+
+    def receive(self, amount):
+        self.money += amount
+
+    def __repr__(self):
+        return f'<Player {self.name}>'
+
+# File: models/property.py
+from app import db
+
+class Property(db.Model):
+    __tablename__ = 'properties'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    color = db.Column(db.String(50))
+    group = db.Column(db.Integer)
+    price = db.Column(db.Numeric(10, 2), default=0.00)
+    baserent = db.Column(db.Numeric(10, 2), default=0.00)
+    rent1 = db.Column(db.Numeric(10, 2), default=0.00)
+    rent2 = db.Column(db.Numeric(10, 2), default=0.00)
+    rent3 = db.Column(db.Numeric(10, 2), default=0.00)
+    rent4 = db.Column(db.Numeric(10, 2), default=0.00)
+    rent5 = db.Column(db.Numeric(10, 2), default=0.00)
+    owner_id = db.Column(db.Integer, db.ForeignKey('players.id'), nullable=True)
+    mortgaged = db.Column(db.Boolean, default=False)
+    houses = db.Column(db.Integer, default=0)
+    hotel = db.Column(db.Boolean, default=False)
+    houseprice = db.Column(db.Numeric(10, 2), default=0.00)
+    landcount = db.Column(db.Integer, default=0)
+
+    def calculate_rent(self):
+        if self.hotel:
+            return self.rent5
+        return [self.baserent, self.rent1, self.rent2, self.rent3, self.rent4][self.houses]
+
+    def __repr__(self):
+        return f'<Property {self.name}>'
+
+# File: models/auction.py
+from app import db
+
+class Auction(db.Model):
+    __tablename__ = 'auctions'
+
+    id = db.Column(db.Integer, primary_key=True)
+    property_id = db.Column(db.Integer, db.ForeignKey('properties.id'), nullable=False)
+    highest_bid = db.Column(db.Numeric(10, 2), default=0.00)
+    highest_bidder = db.Column(db.Integer, db.ForeignKey('players.id'), nullable=True)
+    current_bidder = db.Column(db.Integer, db.ForeignKey('players.id'), nullable=True)
+    status = db.Column(db.String(50), default='ongoing')
+
+    def place_bid(self, bidder_id, amount):
+        if amount > self.highest_bid:
+            self.highest_bid = amount
+            self.highest_bidder = bidder_id
+            return True
+        return False
+
+    def __repr__(self):
+        return f'<Auction Property {self.property_id}>'
+
+# File: models/trade.py
+from app import db
+
+class Trade(db.Model):
+    __tablename__ = 'trades'
+
+    id = db.Column(db.Integer, primary_key=True)
+    initiator = db.Column(db.Integer, db.ForeignKey('players.id'), nullable=False)
+    recipient = db.Column(db.Integer, db.ForeignKey('players.id'), nullable=False)
+    money_offer = db.Column(db.Numeric(10, 2), default=0.00)
+    money_request = db.Column(db.Numeric(10, 2), default=0.00)
+    properties_offer = db.Column(db.Text, nullable=True)  # JSON format
+    properties_request = db.Column(db.Text, nullable=True)
+    status = db.Column(db.String(50), default='pending')
+
+    def __repr__(self):
+        return f'<Trade {self.id}>'
+
+# File: models/card.py
+from app import db
+
+class Card(db.Model):
+    __tablename__ = 'cards'
+
+    id = db.Column(db.Integer, primary_key=True)
+    type = db.Column(db.Enum('Chance', 'Community Chest'), nullable=False)
+    text = db.Column(db.Text, nullable=False)
+    action = db.Column(db.Text, nullable=True)
+
+    def __repr__(self):
+        return f'<Card {self.id}>'
+
+# File: models/game_state.py
+from app import db
+
+class GameState(db.Model):
+    __tablename__ = 'game_state'
+
+    id = db.Column(db.Integer, primary_key=True)
+    current_turn = db.Column(db.Integer, db.ForeignKey('players.id'), nullable=True)
+    double_roll_count = db.Column(db.Integer, default=0)
+    auction_queue = db.Column(db.Text, nullable=True)  # JSON format
+    chance_deck = db.Column(db.Text, nullable=True)
+    community_chest_deck = db.Column(db.Text, nullable=True)
+
+    def __repr__(self):
+        return f'<GameState {self.id}>'
+
+# File: models/game.py
+from app import db
+
+class Game:
+    def __init__(self):
+        self.players = []
+        self.properties = []
+        self.current_turn = 0
+        self.auctions = []
+        self.chance_deck = []
+        self.community_chest_deck = []
+
+    def roll_dice(self):
+        import random
+        return random.randint(1, 6), random.randint(1, 6)
+
+    def next_turn(self):
+        self.current_turn = (self.current_turn + 1) % len(self.players)
+
+    def add_player(self, player):
+        self.players.append(player)
+
+    def add_property(self, property_):
+        self.properties.append(property_)
+
+    def __repr__(self):
+        return f'<Game with {len(self.players)} players>'
