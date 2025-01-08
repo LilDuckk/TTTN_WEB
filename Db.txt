@@ -1,0 +1,99 @@
+-- Tạo cơ sở dữ liệu
+CREATE DATABASE IF NOT EXISTS monopoly_web;
+USE monopoly_web;
+
+-- Tạo bảng Players
+CREATE TABLE Players (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    color VARCHAR(50) NOT NULL,
+    position INT DEFAULT 0,
+    money DECIMAL(10,2) DEFAULT 1500.00,
+    creditor INT DEFAULT NULL,
+    jail BOOLEAN DEFAULT FALSE,
+    jail_roll INT DEFAULT 0,
+    community_chest_card BOOLEAN DEFAULT FALSE,
+    chance_card BOOLEAN DEFAULT FALSE
+);
+
+-- Tạo bảng Properties
+CREATE TABLE Properties (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    color VARCHAR(50) DEFAULT NULL,
+    `group` INT DEFAULT NULL,
+    price DECIMAL(10,2) DEFAULT 0.00,
+    baserent DECIMAL(10,2) DEFAULT 0.00,
+    rent1 DECIMAL(10,2) DEFAULT 0.00,
+    rent2 DECIMAL(10,2) DEFAULT 0.00,
+    rent3 DECIMAL(10,2) DEFAULT 0.00,
+    rent4 DECIMAL(10,2) DEFAULT 0.00,
+    rent5 DECIMAL(10,2) DEFAULT 0.00,
+    owner_id INT DEFAULT NULL,
+    mortgaged BOOLEAN DEFAULT FALSE,
+    houses INT DEFAULT 0,
+    hotel BOOLEAN DEFAULT FALSE,
+    houseprice DECIMAL(10,2) DEFAULT 0.00,
+    landcount INT DEFAULT 0,
+    FOREIGN KEY (owner_id) REFERENCES Players(id)
+);
+
+-- Tạo bảng Cards
+CREATE TABLE Cards (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    type ENUM('Chance', 'Community Chest') NOT NULL,
+    text TEXT NOT NULL,
+    action TEXT DEFAULT NULL
+);
+
+-- Tạo bảng Auctions
+CREATE TABLE Auctions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    property_id INT NOT NULL,
+    highest_bid DECIMAL(10,2) DEFAULT 0.00,
+    highest_bidder INT DEFAULT NULL,
+    current_bidder INT DEFAULT NULL,
+    status VARCHAR(50) DEFAULT 'ongoing',
+    FOREIGN KEY (property_id) REFERENCES Properties(id),
+    FOREIGN KEY (highest_bidder) REFERENCES Players(id),
+    FOREIGN KEY (current_bidder) REFERENCES Players(id)
+);
+
+-- Tạo bảng GameState
+CREATE TABLE GameState (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    current_turn INT DEFAULT NULL,
+    double_roll_count INT DEFAULT 0,
+    auction_queue TEXT DEFAULT NULL,
+    chance_deck TEXT DEFAULT NULL,
+    community_chest_deck TEXT DEFAULT NULL,
+    FOREIGN KEY (current_turn) REFERENCES Players(id)
+);
+
+-- Tạo bảng Transactions
+CREATE TABLE Transactions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    from_player INT DEFAULT NULL,
+    to_player INT DEFAULT NULL,
+    amount DECIMAL(10,2) DEFAULT 0.00,
+    property_id INT DEFAULT NULL,
+    type VARCHAR(50) NOT NULL,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (from_player) REFERENCES Players(id),
+    FOREIGN KEY (to_player) REFERENCES Players(id),
+    FOREIGN KEY (property_id) REFERENCES Properties(id)
+);
+
+-- Tạo bảng Trades
+CREATE TABLE Trades (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    initiator INT NOT NULL,
+    recipient INT NOT NULL,
+    money_offer DECIMAL(10,2) DEFAULT 0.00,
+    money_request DECIMAL(10,2) DEFAULT 0.00,
+    properties_offer TEXT DEFAULT NULL,
+    properties_request TEXT DEFAULT NULL,
+    status VARCHAR(50) DEFAULT 'pending',
+    FOREIGN KEY (initiator) REFERENCES Players(id),
+    FOREIGN KEY (recipient) REFERENCES Players(id)
+);
