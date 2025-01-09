@@ -1,0 +1,200 @@
+# File: app.py
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+
+# Initialize Flask app
+app = Flask(__name__)
+
+# Database configuration
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://username:password@localhost/monopoly_web'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Initialize database and migrations
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
+
+# Import models (used for migrations)
+from models.player import Player
+from models.property import Property
+from models.auction import Auction
+from models.trade import Trade
+from models.card import Card
+from models.game_state import GameState
+from models.game import Game
+
+# Import routes
+from routes.player_routes import player_routes
+from routes.property_routes import property_routes
+from routes.auction_routes import auction_routes
+from routes.trade_routes import trade_routes
+from routes.card_routes import card_routes
+from routes.game_routes import game_routes
+
+# Register routes
+app.register_blueprint(player_routes, url_prefix='/api/players')
+app.register_blueprint(property_routes, url_prefix='/api/properties')
+app.register_blueprint(auction_routes, url_prefix='/api/auctions')
+app.register_blueprint(trade_routes, url_prefix='/api/trades')
+app.register_blueprint(card_routes, url_prefix='/api/cards')
+app.register_blueprint(game_routes, url_prefix='/api/game')
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+# File: routes/player_routes.py
+from flask import Blueprint, jsonify, request
+from models.player import Player
+from app import db
+
+player_routes = Blueprint('player_routes', __name__)
+
+@player_routes.route('/', methods=['GET'])
+def get_players():
+    players = Player.query.all()
+    return jsonify([player.__dict__ for player in players])
+
+@player_routes.route('/', methods=['POST'])
+def add_player():
+    data = request.json
+    new_player = Player(
+        name=data['name'],
+        color=data['color']
+    )
+    db.session.add(new_player)
+    db.session.commit()
+    return jsonify(new_player.__dict__), 201
+
+# File: routes/property_routes.py
+from flask import Blueprint, jsonify, request
+from models.property import Property
+from app import db
+
+property_routes = Blueprint('property_routes', __name__)
+
+@property_routes.route('/', methods=['GET'])
+def get_properties():
+    properties = Property.query.all()
+    return jsonify([prop.__dict__ for prop in properties])
+
+@property_routes.route('/<int:property_id>', methods=['GET'])
+def get_property(property_id):
+    property_ = Property.query.get_or_404(property_id)
+    return jsonify(property_.__dict__)
+
+@property_routes.route('/', methods=['POST'])
+def add_property():
+    data = request.json
+    new_property = Property(
+        name=data['name'],
+        color=data['color'],
+        price=data['price'],
+        baserent=data['baserent']
+    )
+    db.session.add(new_property)
+    db.session.commit()
+    return jsonify(new_property.__dict__), 201
+
+# File: routes/auction_routes.py
+from flask import Blueprint, jsonify, request
+from models.auction import Auction
+from app import db
+
+auction_routes = Blueprint('auction_routes', __name__)
+
+@auction_routes.route('/start', methods=['POST'])
+def start_auction():
+    data = request.json
+    new_auction = Auction(
+        property_id=data['property_id']
+    )
+    db.session.add(new_auction)
+    db.session.commit()
+    return jsonify(new_auction.__dict__), 201
+
+@auction_routes.route('/<int:auction_id>/bid', methods=['POST'])
+def place_bid(auction_id):
+    auction = Auction.query.get_or_404(auction_id)
+    data = request.json
+    if auction.place_bid(data['bidder_id'], data['amount']):
+        db.session.commit()
+        return jsonify({'message': 'Bid placed successfully.'})
+    return jsonify({'error': 'Bid too low.'}), 400
+
+# File: routes/trade_routes.py
+from flask import Blueprint, jsonify, request
+from models.trade import Trade
+from app import db
+
+trade_routes = Blueprint('trade_routes', __name__)
+
+@trade_routes.route('/propose', methods=['POST'])
+def propose_trade():
+    data = request.json
+    new_trade = Trade(
+        initiator=data['initiator'],
+        recipient=data['recipient'],
+        money_offer=data.get('money_offer', 0),
+        money_request=data.get('money_request', 0),
+        properties_offer=data.get('properties_offer', []),
+        properties_request=data.get('properties_request', [])
+    )
+    db.session.add(new_trade)
+    db.session.commit()
+    return jsonify(new_trade.__dict__), 201
+
+@trade_routes.route('/<int:trade_id>/accept', methods=['POST'])
+def accept_trade(trade_id):
+    trade = Trade.query.get_or_404(trade_id)
+    trade.status = 'accepted'
+    db.session.commit()
+    return jsonify({'message': 'Trade accepted.'})
+
+@trade_routes.route('/<int:trade_id>/reject', methods=['POST'])
+def reject_trade(trade_id):
+    trade = Trade.query.get_or_404(trade_id)
+    trade.status = 'rejected'
+    db.session.commit()
+    return jsonify({'message': 'Trade rejected.'})
+
+# File: routes/card_routes.py
+from flask import Blueprint, jsonify
+from models.card import Card
+from app import db
+
+card_routes = Blueprint('card_routes', __name__)
+
+@card_routes.route('/draw/<string:deck>', methods=['GET'])
+def draw_card(deck):
+    card = Card.query.filter_by(type=deck).first()
+    if not card:
+        return jsonify({'error': 'No cards left in the deck.'}), 404
+    db.session.delete(card)
+    db.session.commit()
+    return jsonify({'text': card.text, 'action': card.action})
+
+# File: routes/game_routes.py
+from flask import Blueprint, jsonify, request
+from models.game_state import GameState
+from app import db
+
+game_routes = Blueprint('game_routes', __name__)
+
+@game_routes.route('/state', methods=['GET'])
+def get_game_state():
+    state = GameState.query.first()
+    if not state:
+        return jsonify({'error': 'Game state not initialized.'}), 404
+    return jsonify(state.__dict__)
+
+@game_routes.route('/state', methods=['POST'])
+def set_game_state():
+    data = request.json
+    state = GameState.query.first()
+    if not state:
+        state = GameState()
+    state.current_turn = data.get('current_turn', state.current_turn)
+    state.double_roll_count = data.get('double_roll_count', state.double_roll_count)
+    db.session.add(state)
+    db.session.commit()
+    return jsonify(state.__dict__)
