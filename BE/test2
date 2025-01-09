@@ -3,27 +3,24 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
-# Initialize Flask app
 app = Flask(__name__)
 
-# Database configuration
+# Cấu hình cơ sở dữ liệu
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://username:password@localhost/monopoly_web'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Initialize database and migrations
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-# Import models (used for migrations)
+# Import các models và routes
 from models.player import Player
 from models.property import Property
 from models.auction import Auction
 from models.trade import Trade
 from models.card import Card
 from models.game_state import GameState
-from models.game import Game
+from models.board_square import BoardSquare
 
-# Import routes
 from routes.player_routes import player_routes
 from routes.property_routes import property_routes
 from routes.auction_routes import auction_routes
@@ -31,7 +28,7 @@ from routes.trade_routes import trade_routes
 from routes.card_routes import card_routes
 from routes.game_routes import game_routes
 
-# Register routes
+# Đăng ký routes
 app.register_blueprint(player_routes, url_prefix='/api/players')
 app.register_blueprint(property_routes, url_prefix='/api/properties')
 app.register_blueprint(auction_routes, url_prefix='/api/auctions')
@@ -42,140 +39,190 @@ app.register_blueprint(game_routes, url_prefix='/api/game')
 if __name__ == '__main__':
     app.run(debug=True)
 
-# File: routes/player_routes.py
-from flask import Blueprint, jsonify, request
-from models.player import Player
+# File: models/player.py
 from app import db
 
-player_routes = Blueprint('player_routes', __name__)
+class Player(db.Model):
+    __tablename__ = 'players'
 
-@player_routes.route('/', methods=['GET'])
-def get_players():
-    players = Player.query.all()
-    return jsonify([player.__dict__ for player in players])
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    color = db.Column(db.String(50), nullable=False)
+    position = db.Column(db.Integer, default=0)
+    money = db.Column(db.Numeric(10, 2), default=1500.00)
+    creditor = db.Column(db.Integer, db.ForeignKey('players.id'), nullable=True)
+    jail = db.Column(db.Boolean, default=False)
+    jail_roll = db.Column(db.Integer, default=0)
+    community_chest_card = db.Column(db.Boolean, default=False)
+    chance_card = db.Column(db.Boolean, default=False)
 
-@player_routes.route('/', methods=['POST'])
-def add_player():
-    data = request.json
-    new_player = Player(
-        name=data['name'],
-        color=data['color']
-    )
-    db.session.add(new_player)
-    db.session.commit()
-    return jsonify(new_player.__dict__), 201
+    def pay(self, amount):
+        if self.money >= amount:
+            self.money -= amount
+            return True
+        return False
 
-# File: routes/property_routes.py
-from flask import Blueprint, jsonify, request
-from models.property import Property
+    def receive(self, amount):
+        self.money += amount
+
+    def __repr__(self):
+        return f'<Player {self.name}>'
+
+# File: models/property.py
 from app import db
 
-property_routes = Blueprint('property_routes', __name__)
+class Property(db.Model):
+    __tablename__ = 'properties'
 
-@property_routes.route('/', methods=['GET'])
-def get_properties():
-    properties = Property.query.all()
-    return jsonify([prop.__dict__ for prop in properties])
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    color = db.Column(db.String(50))
+    group = db.Column(db.Integer)
+    price = db.Column(db.Numeric(10, 2), default=0.00)
+    baserent = db.Column(db.Numeric(10, 2), default=0.00)
+    rent1 = db.Column(db.Numeric(10, 2), default=0.00)
+    rent2 = db.Column(db.Numeric(10, 2), default=0.00)
+    rent3 = db.Column(db.Numeric(10, 2), default=0.00)
+    rent4 = db.Column(db.Numeric(10, 2), default=0.00)
+    rent5 = db.Column(db.Numeric(10, 2), default=0.00)
+    owner_id = db.Column(db.Integer, db.ForeignKey('players.id'), nullable=True)
+    mortgaged = db.Column(db.Boolean, default=False)
+    houses = db.Column(db.Integer, default=0)
+    hotel = db.Column(db.Boolean, default=False)
+    houseprice = db.Column(db.Numeric(10, 2), default=0.00)
+    landcount = db.Column(db.Integer, default=0)
 
-@property_routes.route('/<int:property_id>', methods=['GET'])
-def get_property(property_id):
-    property_ = Property.query.get_or_404(property_id)
-    return jsonify(property_.__dict__)
+    def calculate_rent(self):
+        if self.hotel:
+            return self.rent5
+        return [self.baserent, self.rent1, self.rent2, self.rent3, self.rent4][self.houses]
 
-@property_routes.route('/', methods=['POST'])
-def add_property():
-    data = request.json
-    new_property = Property(
-        name=data['name'],
-        color=data['color'],
-        price=data['price'],
-        baserent=data['baserent']
-    )
-    db.session.add(new_property)
-    db.session.commit()
-    return jsonify(new_property.__dict__), 201
+    def __repr__(self):
+        return f'<Property {self.name}>'
 
-# File: routes/auction_routes.py
-from flask import Blueprint, jsonify, request
-from models.auction import Auction
+# File: models/auction.py
 from app import db
 
-auction_routes = Blueprint('auction_routes', __name__)
+class Auction(db.Model):
+    __tablename__ = 'auctions'
 
-@auction_routes.route('/start', methods=['POST'])
-def start_auction():
-    data = request.json
-    new_auction = Auction(
-        property_id=data['property_id']
-    )
-    db.session.add(new_auction)
-    db.session.commit()
-    return jsonify(new_auction.__dict__), 201
+    id = db.Column(db.Integer, primary_key=True)
+    property_id = db.Column(db.Integer, db.ForeignKey('properties.id'), nullable=False)
+    highest_bid = db.Column(db.Numeric(10, 2), default=0.00)
+    highest_bidder = db.Column(db.Integer, db.ForeignKey('players.id'), nullable=True)
+    current_bidder = db.Column(db.Integer, db.ForeignKey('players.id'), nullable=True)
+    status = db.Column(db.String(50), default='ongoing')
 
-@auction_routes.route('/<int:auction_id>/bid', methods=['POST'])
-def place_bid(auction_id):
-    auction = Auction.query.get_or_404(auction_id)
-    data = request.json
-    if auction.place_bid(data['bidder_id'], data['amount']):
-        db.session.commit()
-        return jsonify({'message': 'Bid placed successfully.'})
-    return jsonify({'error': 'Bid too low.'}), 400
+    def place_bid(self, bidder_id, amount):
+        if amount > self.highest_bid:
+            self.highest_bid = amount
+            self.highest_bidder = bidder_id
+            return True
+        return False
 
-# File: routes/trade_routes.py
-from flask import Blueprint, jsonify, request
-from models.trade import Trade
+    def __repr__(self):
+        return f'<Auction Property {self.property_id}>'
+
+# File: models/trade.py
 from app import db
 
-trade_routes = Blueprint('trade_routes', __name__)
+class Trade(db.Model):
+    __tablename__ = 'trades'
 
-@trade_routes.route('/propose', methods=['POST'])
-def propose_trade():
-    data = request.json
-    new_trade = Trade(
-        initiator=data['initiator'],
-        recipient=data['recipient'],
-        money_offer=data.get('money_offer', 0),
-        money_request=data.get('money_request', 0),
-        properties_offer=data.get('properties_offer', []),
-        properties_request=data.get('properties_request', [])
-    )
-    db.session.add(new_trade)
-    db.session.commit()
-    return jsonify(new_trade.__dict__), 201
+    id = db.Column(db.Integer, primary_key=True)
+    initiator = db.Column(db.Integer, db.ForeignKey('players.id'), nullable=False)
+    recipient = db.Column(db.Integer, db.ForeignKey('players.id'), nullable=False)
+    money_offer = db.Column(db.Numeric(10, 2), default=0.00)
+    money_request = db.Column(db.Numeric(10, 2), default=0.00)
+    properties_offer = db.Column(db.Text, nullable=True)  # JSON format
+    properties_request = db.Column(db.Text, nullable=True)
+    status = db.Column(db.String(50), default='pending')
 
-@trade_routes.route('/<int:trade_id>/accept', methods=['POST'])
-def accept_trade(trade_id):
-    trade = Trade.query.get_or_404(trade_id)
-    trade.status = 'accepted'
-    db.session.commit()
-    return jsonify({'message': 'Trade accepted.'})
+    def __repr__(self):
+        return f'<Trade {self.id}>'
 
-@trade_routes.route('/<int:trade_id>/reject', methods=['POST'])
-def reject_trade(trade_id):
-    trade = Trade.query.get_or_404(trade_id)
-    trade.status = 'rejected'
-    db.session.commit()
-    return jsonify({'message': 'Trade rejected.'})
-
-# File: routes/card_routes.py
-from flask import Blueprint, jsonify
-from models.card import Card
+# File: models/card.py
 from app import db
 
-card_routes = Blueprint('card_routes', __name__)
+class Card(db.Model):
+    __tablename__ = 'cards'
 
-@card_routes.route('/draw/<string:deck>', methods=['GET'])
-def draw_card(deck):
-    card = Card.query.filter_by(type=deck).first()
-    if not card:
-        return jsonify({'error': 'No cards left in the deck.'}), 404
-    db.session.delete(card)
-    db.session.commit()
-    return jsonify({'text': card.text, 'action': card.action})
+    id = db.Column(db.Integer, primary_key=True)
+    type = db.Column(db.Enum('Chance', 'Community Chest'), nullable=False)
+    text = db.Column(db.Text, nullable=False)
+    action = db.Column(db.Text, nullable=True)
+
+    def __repr__(self):
+        return f'<Card {self.id}>'
+
+# File: models/game_state.py
+from app import db
+
+class GameState(db.Model):
+    __tablename__ = 'game_state'
+
+    id = db.Column(db.Integer, primary_key=True)
+    current_turn = db.Column(db.Integer, db.ForeignKey('players.id'), nullable=True)
+    double_roll_count = db.Column(db.Integer, default=0)
+    auction_queue = db.Column(db.Text, nullable=True)  # JSON format
+    chance_deck = db.Column(db.Text, nullable=True)
+    community_chest_deck = db.Column(db.Text, nullable=True)
+
+    def __repr__(self):
+        return f'<GameState {self.id}>'
+
+# File: models/game.py
+class Game:
+    def __init__(self):
+        self.players = []
+        self.properties = []
+        self.current_turn = 0
+        self.auctions = []
+        self.chance_deck = []
+        self.community_chest_deck = []
+
+    def roll_dice(self):
+        import random
+        return random.randint(1, 6), random.randint(1, 6)
+
+    def next_turn(self):
+        self.current_turn = (self.current_turn + 1) % len(self.players)
+
+    def add_player(self, player):
+        self.players.append(player)
+
+    def add_property(self, property_):
+        self.properties.append(property_)
+
+    def __repr__(self):
+        return f'<Game with {len(self.players)} players>'
+
+# File: models/board_square.py
+from app import db
+
+class BoardSquare(db.Model):
+    __tablename__ = 'board'
+
+    position = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    type = db.Column(db.Enum(
+        'start', 'property', 'chance', 'community_chest', 'tax', 
+        'jail', 'go_to_jail', 'free_parking', 'other'), nullable=False)
+    price = db.Column(db.Numeric(10, 2), nullable=True)
+    rent = db.Column(db.Numeric(10, 2), nullable=True)
+    group_id = db.Column(db.Integer, nullable=True)
+    special_action = db.Column(db.Text, nullable=True)
+
+    def __repr__(self):
+        return f'<BoardSquare {self.name} (Position: {self.position})>'
 
 # File: routes/game_routes.py
 from flask import Blueprint, jsonify, request
 from models.game_state import GameState
+from models.player import Player
+from models.board_square import BoardSquare
+from models.property import Property
+from models.card import Card
 from app import db
 
 game_routes = Blueprint('game_routes', __name__)
@@ -198,3 +245,46 @@ def set_game_state():
     db.session.add(state)
     db.session.commit()
     return jsonify(state.__dict__)
+
+@game_routes.route('/move', methods=['POST'])
+def move_player():
+    data = request.json
+    player_id = data['player_id']
+    dice_roll = data['dice_roll']
+
+    # Lấy thông tin người chơi
+    player = Player.query.get_or_404(player_id)
+    new_position = (player.position + sum(dice_roll)) % 40
+    player.position = new_position
+
+    # Lấy thông tin ô từ bảng Board
+    square = BoardSquare.query.get(new_position)
+
+    # Xử lý logic tùy theo loại ô
+    if square.type == 'property':
+        property_ = Property.query.get(new_position)
+        if property_.owner_id is None:
+            return jsonify({'message': f'{player.name} can buy {square.name}.'})
+        else:
+            rent = property_.calculate_rent()
+            player.pay(rent)
+            owner = Player.query.get(property_.owner_id)
+            owner.receive(rent)
+            db.session.commit()
+            return jsonify({'message': f'{player.name} paid ${rent} rent to {owner.name}.'})
+    elif square.type == 'go_to_jail':
+        player.position = 10  # Jail position
+        player.jail = True
+        db.session.commit()
+        return jsonify({'message': f'{player.name} is sent to jail.'})
+    elif square.type == 'start':
+        player.money += 200
+        db.session.commit()
+        return jsonify({'message': f'{player.name} collected $200 for passing GO.'})
+    elif square.type == 'chance':
+        card = Card.query.filter_by(type='Chance').first()
+        if card:
+            return jsonify({'message': f'{player.name} drew a Chance card: {card.text}'})
+
+    db.session.commit()
+    return jsonify({'message': f'{player.name} moved to {square.name}.'})

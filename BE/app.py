@@ -4,6 +4,11 @@ from flask_migrate import Migrate
 
 #Cài đặt các thư viện cần thiết
 #pip install flask flask-sqlalchemy flask-migrate mysqlclient
+#Tạo database monôply_web trong MariaDB
+#Khởi tạo database và migrations
+#flask db init
+#flask db migrate -m "Initial migration"
+#flask db upgrade
 
 # Initialize Flask app
 app = Flask(__name__)

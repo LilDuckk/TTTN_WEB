@@ -1,0 +1,24 @@
+9/10/2025 - 15h11p:
+- Các tính năng hiện có và những gì đã hoàn thành
+- Tính năng cơ bản đã triển khai:
+        + Quản lý người chơi: Thêm người chơi mới, lưu thông tin vị trí, tiền, và các trạng thái khác.
+        + Quản lý tài sản: Xem thông tin tài sản, tính tiền thuê.
+        + Giao dịch: Đề xuất, chấp nhận, hoặc từ chối giao dịch.
+        + Đấu giá: Xử lý đấu giá tài sản khi không có người chơi mua ngay.
+        + Lá bài Chance và Community Chest: Rút bài và thực hiện hành động dựa trên nội dung.
+        + Điều phối trạng thái trò chơi: Lượt chơi, xúc xắc, và trạng thái game.
+        + Quản lý di chuyển của người chơi
+        + Quản lý phá sản
+        + Mua nhà và khách sạn
+-  Tính năng cơ bản thiếu:
+        + Quản lý vòng lặp lượt chơi :
+            - Logic chuyển lượt chỉ đơn giản tăng lượt, chưa xử lý các trường hợp như:
+                    Người chơi ra xúc xắc đôi (được chơi thêm).
+                    Người chơi bị vào tù hoặc thoát tù.
+        + Quản lý bộ bài Chance và Community Chest: 
+            - Hiện tại chỉ rút bài từ bộ, chưa quản lý hành động phức tạp của lá bài (ví dụ, "Đi tới ô GO").
+        + Logic kết thúc trò chơi:
+            - Chưa có cách xác định người thắng (người chơi cuối cùng không bị phá sản).
+
+- Cập nhật bảng Board_Square lưu thông tin ô trong bảng trò chơi.
+
