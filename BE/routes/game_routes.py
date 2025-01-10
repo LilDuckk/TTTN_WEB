@@ -36,35 +36,57 @@ def move_player():
     # Lấy thông tin người chơi
     player = Player.query.get_or_404(player_id)
     new_position = (player.position + sum(dice_roll)) % 40
+
+    # Kiểm tra nếu người chơi đi qua ô "GO"
+    if player.position > new_position:  # Đi qua "GO"
+        player.money += 200  # Thêm $200 vào tài khoản người chơi
+
     player.position = new_position
 
-    # Lấy thông tin ô từ bảng Board
+    # Lấy thông tin ô từ bảng `Board`
     square = BoardSquare.query.get(new_position)
 
-    # Xử lý logic tùy theo loại ô
-    if square.type == 'property':
-        if not square.owner_id:
-            return jsonify({'message': f'{player.name} can buy {square.name}.'})
+    # Xử lý tùy theo loại ô
+    if square.type == 'START':
+        player.money += 200  # Nếu dừng trực tiếp tại "GO", nhận thêm $200
+        db.session.commit()
+        return jsonify({'message': f'{player.name} collected $200 for landing on GO.', 'money': player.money})
+    elif square.type == 'CITY':
+        # Xử lý logic cho ô tài sản
+        rent = json.loads(square.rent)['0']  # Tiền thuê cấp 0
+        if square.price is None:  # Ô chưa có chủ sở hữu
+            return jsonify({'message': f'{player.name} can buy {square.label}.'})
         else:
-            rent = square.rent
             player.pay(rent)
-            owner = Player.query.get(square.owner_id)
-            owner.receive(rent)
-            return jsonify({'message': f'{player.name} paid ${rent} rent to {owner.name}.'})
-    elif square.type == 'go_to_jail':
+            db.session.commit()
+            return jsonify({'message': f'{player.name} paid ${rent} rent.'})
+    elif square.type == 'GOTO':
         player.position = 10  # Jail position
         player.jail = True
         db.session.commit()
         return jsonify({'message': f'{player.name} is sent to jail.'})
-    elif square.type == 'start':
-        player.money += 200
-        db.session.commit()
-        return jsonify({'message': f'{player.name} collected $200 for passing GO.'})
-    elif square.type == 'chance':
+    
+    elif square.type == 'CHANCE':
+        # Rút lá bài từ bộ bài Chance
         card = Card.query.filter_by(type='Chance').first()
-        if card:
-            return jsonify({'message': f'{player.name} drew a Chance card: {card.text}'})
+        if not card:
+            return jsonify({'message': f'{player.name} landed on Chance but no cards are available.'}), 404
 
+        # Thực hiện hành động từ lá bài
+        action = card.action  # Giả định `action` chứa logic (vd: "advance_to_go")
+        message = f'{player.name} drew a Chance card: {card.text}'
+        
+        # Hành động đặc biệt: ví dụ "Đi tới ô GO"
+        if action == 'advance_to_go':
+            player.position = 0
+            player.money += 200
+            message += " and moved to GO, collecting $200."
+
+        # Xóa lá bài khỏi bộ bài sau khi rút
+        db.session.delete(card)
+        db.session.commit()
+        return jsonify({'message': message})
+    
     db.session.commit()
-    return jsonify({'message': f'{player.name} moved to {square.name}.'})
+    return jsonify({'message': f'{player.name} moved to {square.label}.'})
 
