@@ -1,0 +1,43 @@
+{% for field in game.board %}
+    <div
+            class="tile"
+            data-type="{{ field.type }}"
+            data-id="{{ field.id }}"
+            {% if field.type == 'CITY' %}
+            data-build_price="{{ field.build_price }}"
+            data-build="{{ field.build }}"
+            data-owner_id="{{ field.owner.id if field.owner else "" }}"
+            {% endif %}
+            id="field{{ loop.index0 }}">
+        {{ field.label }}
+
+        {% if field.owner %}
+            <div style="background-color: {{ field.owner.color }}" class="ownership">{{ field.owner.id }}</div>
+        {% endif %}
+
+        <div class="players">
+            {% set fieldloop = loop %}
+            {% for player in game.players %}
+                {% if player.current_field_id == fieldloop.index0 %}
+                    <div style="background-color: {{ player.color }}" class="player">{{ player.id }}</div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+
+        {% if field.type == 'CITY' %}
+            <div class="buildings">
+                {% if field.build == 'h' %}
+                    <i class="fas fa-building"></i>
+                {% else %}
+                    {% for _ in range(field.build|int) %}
+                        <i class="fas fa-home"></i>
+                        {% if loop.index0  == 1 %}
+                            <br>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+{% endfor %}

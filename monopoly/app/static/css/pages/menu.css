@@ -1,0 +1,18 @@
+h2 {
+  margin-top: 7rem;
+  text-align: center; }
+
+  .modes-container {
+    padding: 1rem 0 0 0;
+    display: flex;
+    justify-content: space-around; }
+
+    .tile {
+      border: 1px solid #B8C6D0;
+      padding: 1.6rem;
+      border-radius: 1rem; }
+      .tile p {
+        margin-bottom: 0;
+        text-align: center; }
+        .tile img {
+          width: 5rem; }

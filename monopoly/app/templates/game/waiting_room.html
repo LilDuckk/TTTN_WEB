@@ -1,0 +1,41 @@
+{% extends 'layout.html' %}
+
+
+{% block css%}
+{% assets "waiting_room_scss" %}
+<link rel=stylesheet type=text/css href="{{ ASSET_URL }}">
+{% endassets %}
+{% endblock %}
+
+
+{% block body %}
+<div class="container">
+    <div class="content">
+        {% if is_host %}
+        <p>join code - send this to person you want to play with</p>
+        <h2>
+            <span class="code">{{ code }}</span>
+            <img class="copy-icon" src="{{url_for('static', filename='images/copy-solid.svg')}}" alt="copy">
+        </h2>
+        <form method="POST">
+            <!-- <input type="submit" value="start game" class="start-btn"> -->
+            <button type="submit" class="start-btn">start game
+                <div class="icon-box">
+                    <img src="{{url_for('static', filename='images/play-solid.svg')}}" alt="play icon">
+                </div>
+            </button>
+        </form>
+        {% else %}
+        <form method="POST">
+            <input type="submit" value="play" class="btn btn-primary">
+        </form>
+        {% endif %}
+    </div>
+</div>
+<script>
+    document.querySelector('.copy-icon').addEventListener('click', e => {
+        const code = document.querySelector('.code').textContent;
+        navigator.clipboard.writeText(code);
+    })
+</script>
+{% endblock %}

@@ -1,0 +1,13 @@
+.content {
+  margin-top: 4rem; }
+
+  .game_list {
+    padding: 0;
+    margin: 0;
+    padding-left: 1rem;
+    list-style: none;
+    max-height: 80vh;
+    min-height: 20vh; }
+
+    .game a:hover {
+      color: brown; }

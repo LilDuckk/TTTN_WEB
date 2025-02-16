@@ -1,0 +1,49 @@
+{% extends 'layout.html' %}
+
+{% block css%}
+    {% assets "home_scss" %}
+    <link rel=stylesheet type=text/css href="{{ ASSET_URL }}">
+    {% endassets %}
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="row">
+            <div class="img-container">
+               <img class="img-fluid" src="{{url_for('static', filename='images/landing.svg')}}" alt="people playing monopoly">
+            </div>
+            <div class="text-container">
+                <h1 class="gradient-text">Cờ tỷ phú</h1>
+                <p>Chơi cờ tỷ phú cùng bạn bè với các địa danh của Việt Nam</p>
+                <div class="att-container">
+                    <div class="users_count">
+                        <img src="{{url_for('static', filename='images/users-solid.svg')}}" alt="people">
+                        <span>
+                        {% if users_count <= 100 %}
+                            +100
+                        {% else %}
+                            {{users_count}}
+                        {% endif %}
+                        </span>
+                        <div>registered players</div>
+                    </div>
+                    <div>
+                        <button class="start-btn" data-url="{% if current_user.is_authenticated %}{{ url_for('game.menu') }}{% else %}{{ url_for('auth.login') }}{% endif %}">
+                                Are you ready?
+                                <div class="icon-box">
+                                    <img src="{{ url_for('static', filename='images/play-solid.svg') }}" alt="play icon">
+                                </div>
+                        </button>   
+
+                        <script>
+                            document.querySelector('.start-btn').addEventListener('click', function () {
+                                window.location.href = this.getAttribute('data-url');
+                            });
+                        </script>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

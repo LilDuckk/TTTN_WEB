@@ -1,0 +1,28 @@
+html {
+  font-family: 'Lato', sans-serif;
+  font-size: 17px;
+  color: #131514; }
+  html a {
+    text-decoration: none;
+    color: #131514; }
+    html * {
+      box-sizing: border-box; }
+
+.container {
+  width: 90vw;
+  margin: auto; }
+
+  .gradient-text {
+    font-size: 72px;
+    background: linear-gradient(15deg, black 50%, #505050 60%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent; }
+
+    .alert {
+      position: fixed;
+      bottom: 2rem;
+      padding: 1rem;
+      border: 1px solid green;
+      background-color: lightgreen;
+      color: green;
+      border-radius: 5px; }

@@ -1,0 +1,40 @@
+{% extends 'layout.html' %}
+
+{% block css %}
+    {% assets "scss_all" %}
+        <link rel=stylesheet type=text/css href="{{ ASSET_URL }}">
+    {% endassets %}
+    <script src="https://kit.fontawesome.com/047d79a93f.js" crossorigin="anonymous"></script>
+{% endblock %}
+
+{% block body %}
+
+    <div id="board">
+        {% include 'game/board/fields.html' %}
+
+        {% include 'game/board/display.html' %}
+    </div>
+
+    <div
+            id="player_info"
+            data-current_player_index="{{ game.current_player_index }}"
+            data-current_db_id="{{ game.players[game.current_player_index].db_id }}"
+            data-current_player_money="{{ game.players[game.current_player_index].money }}"
+            data-can_buy="{{ game.can_buy }}"
+            data-code="{{ code }}"
+            {% if game.can_buy %}
+            data-current_field_price="{{ game.board[game.players[game.current_player_index].current_field_id].price }}"
+            {% endif %}
+    ></div>
+{% endblock %}
+
+{% block js %}
+    {% assets "js_build" %}
+        <script src="{{ ASSET_URL }}"></script>
+    {% endassets %}
+    {% if pvp %}
+        <script type="text/javascript"
+                src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.5/socket.io.js"></script>
+        <script src="{{ url_for('static', filename='js/sockets.js') }}"></script>
+    {% endif %}
+{% endblock %}

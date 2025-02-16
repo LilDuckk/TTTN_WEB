@@ -1,0 +1,10 @@
+venv
+.idea
+app/static/.webassets-cache
+app/site.db
+app/.env
+app/game/games/*
+**/__pycache__
+**/*.pyc
+setup.sh
+**/*.pkl

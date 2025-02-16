@@ -1,0 +1,27 @@
+{% extends 'layout.html' %}
+
+{% block css%}
+    {% assets "menu_scss" %}
+    <link rel=stylesheet type=text/css href="{{ ASSET_URL }}">
+    {% endassets %}
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h2>choose game mode</h2>
+            <div class="modes-container">
+                <a class="tile" href="{{ url_for('game.hot_seats') }}">
+                    <img src="{{url_for('static', filename='images/user-group-solid.svg')}}" alt="people">
+                    <p>hot seats</p>
+                </a>
+                <a class="tile" href="{{ url_for('game.vs_ai') }}">
+                    <img src="{{url_for('static', filename='images/robot-solid.svg')}}" alt="people">
+                    <p>vs computer</p>
+                </a>
+                <a class="tile" href="{{ url_for('game.init_pvp') }}">
+                    <img src="{{url_for('static', filename='images/globe-solid.svg')}}" alt="people">
+                    <p>hot seats</p>
+                </a>
+            </div>
+    </div>
+{% endblock %}

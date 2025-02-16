@@ -1,0 +1,33 @@
+{% extends 'layout.html' %}
+
+{% block css%}
+    {% assets "join_scss" %}
+    <link rel=stylesheet type=text/css href="{{ ASSET_URL }}">
+    {% endassets %}
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <form method="POST">
+                    {{ form.hidden_tag() }}
+                        <div class="form-group">
+                            {{ form.join_code.label(class='form-control-label') }}
+                            {% if form.join_code.errors %}
+                                {{ form.join_code(class='form-control form-control-lg is-invalid') }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.join_code.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.join_code(class='form-control form-control-lg') }}
+                            {% endif %}
+                        </div>
+                    <div class="form-group">
+                        {{ form.submit(class='btn') }}
+                    </div>
+                </form>
+    </div>
+
+{% endblock %}
+ 

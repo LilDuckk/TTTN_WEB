@@ -1,0 +1,37 @@
+.content{
+    margin-top: 4rem;
+}
+
+.copy-icon{
+    height: 1rem;
+    margin-left: 1rem;
+    cursor: pointer;
+}
+
+.start-btn{
+    display: flex;
+    align-items: center;
+    background-color: white;
+    border: 1px solid #B8C6D0;
+    // box-shadow: 0px 0px 11px 1px rgba(0,0,0,0.75);
+    padding: .6rem;
+    border-radius: 2.5rem;
+    font-size: 1.2rem;
+    color: #5f5f5f;
+    .icon-box{
+        background-color: rgb(65, 199, 60);
+        box-shadow: 0px 0px 4px 1px rgb(65, 199, 60);
+        margin-left: 1rem;
+        height: 3rem;
+        width: 3rem;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        img{
+            color: white;
+            height: 1.2rem;
+        }
+    }
+    
+}

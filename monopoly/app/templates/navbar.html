@@ -1,0 +1,19 @@
+<header>
+    <a class="logo" href="{{ url_for('game.home') }}">Home</a>
+    <span class="separator"></span>
+    <nav>
+        <ul>
+            {% if current_user.is_authenticated %}
+               <li> <a class="nav-link" href="{{ url_for('auth.profile', user_id=current_user.id) }}">{{ current_user.username}}</a></li>
+                <li><a class="nav-link" href={{ url_for('game.menu') }}>new game</a></li>
+               <li> <a class="nav-link" href={{ url_for('game.join_game') }}>join game</a></li>
+               <li> <a class="nav-link" href={{ url_for('auth.logout') }}>logout</a></li>
+            {% else %}
+               <li> <a class="nav-link" href="{{ url_for('auth.register') }}">register</a></li>
+               <li> <a class="nav-link" href="{{ url_for('auth.login') }}">login</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+</header>
+
+

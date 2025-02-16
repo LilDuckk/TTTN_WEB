@@ -1,0 +1,42 @@
+<div id="display">
+    <div id="dashboard">
+
+        <div>active player: {{ game.current_player_index }}</div>
+        <div class="cash">
+            {% for player in game.players %}
+                player{{ player.id }}: <span class="player{{ player.id }}_money">{{ player.money }}</span>
+            {% endfor %}
+        </div>
+        {% if pvp and not is_active %}
+            <p>wait for your turn.</p>
+        {% else %}
+            <form id="game_form" method="post" action="{{ url_for(request.endpoint, code=code) }}">
+            <input type="hidden" name="next_turn" value="1">
+            <input type="hidden" id="build_input" name="build" value="">
+            {% if game.can_buy %}
+                <div>
+                    <p>
+                        do you want to buy
+                        field: {{ game.board[game.players[game.current_player_index].current_field_id].label }}, for
+                        {{ game.board[game.players[game.current_player_index].current_field_id].price }}?</p>
+                    <label><input class="buy_radio br_no" type="radio" name="buy" value="0">no</label>
+                    <label><input class="buy_radio br_yes" type="radio" name="buy" value="1" checked>yes</label>
+                </div>
+            {% endif %}
+            <input type="submit" value="next turn">
+        </form>
+        {% endif %}
+        <div class="msgs">
+            {% for msg in game.msgs|reverse %}
+                <p class="msg">{{ msg }}</p>
+            {% endfor %}
+        </div>
+    </div>
+    <div id="card_container">
+        <div id="field_card" class="card">
+            <div class="card-body">
+
+            </div>
+        </div>
+    </div>
+</div>

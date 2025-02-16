@@ -1,0 +1,46 @@
+{% extends 'layout.html' %}
+
+{% block css%}
+    {% assets "profile_scss" %}
+    <link rel=stylesheet type=text/css href="{{ ASSET_URL }}">
+    {% endassets %}
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="content">
+           <h1>Hello {{user.username}}</h1> 
+           <h2>pending games</h2>
+           <ul class="game_list">
+               {% for game in user.games %}
+                    {% if game.status == 'STATUS_ACTIVE' %}
+                    <li class="game">
+                            {% if game.mode == 'HOT_SEATS_MODE' %}
+                                <a href="{{url_for('game.hot_seats', code=game.code)}}">
+                            {% endif %}
+                            {% if game.mode == 'PVP_MODE' %}
+                                <a href="{{url_for('game.play_pvp', code=game.code)}}">
+                            {% endif %}
+                            {% if game.mode == 'PVAI_MODE' %}
+                                <a href="{{url_for('game.vs_ai', code=game.code)}}">
+                            {% endif %}
+
+
+                            {% if game.mode == 'HOT_SEATS_MODE' %}
+                                Hot Seats
+                            {% endif %}
+                            {% if game.mode == 'PVP_MODE' %}
+                                PvP
+                            {% endif %}
+                            {% if game.mode == 'PVAI_MODE' %}
+                                Vs Ai
+                            {% endif %}
+                        </a>
+                    </li>
+                    {% endif %}
+               {% endfor %}
+           </ul>
+        </div>
+        
+    </div>
+{% endblock %}

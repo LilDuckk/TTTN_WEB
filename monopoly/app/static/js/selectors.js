@@ -1,0 +1,7 @@
+const tiles = document.querySelectorAll('.tile')
+const display = document.querySelector('#display')
+const playerInfo = document.querySelector('#player_info')
+const br_no = document.querySelector('.br_no')
+const br_yes = document.querySelector('.br_yes')
+const fieldCard = document.querySelector('#field_card')
+const cardBody = document.querySelector('.card-body')

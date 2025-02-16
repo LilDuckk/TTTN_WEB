@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}"> -->
+    
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    
+    {% assets "customs" %}
+        <link rel=stylesheet type=text/css href="{{ ASSET_URL }}">
+    {% endassets %}
+    {% assets "general" %}
+        <link rel=stylesheet type=text/css href="{{ ASSET_URL }}">
+    {% endassets %}
+    {% block css %}{% endblock %}
+</head>
+<body>
+    {% include 'navbar.html' %}
+    <div class="container mt-5 pt-1">
+        {% block body %}{% endblock %}
+    </div>
+    {% include 'messages.html' %}
+    <script src="{{ url_for('static', filename='js/navbar.js') }}"></script>
+    {% block js %}{% endblock %}
+
+</body>
+</html>
