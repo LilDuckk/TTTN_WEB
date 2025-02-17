@@ -1,18 +1,31 @@
 h2 {
   margin-top: 7rem;
-  text-align: center; }
+  text-align: center;
+}
 
-  .modes-container {
-    padding: 1rem 0 0 0;
-    display: flex;
-    justify-content: space-around; }
+.modes-container {
+  padding: 1rem 0 0 0;
+  display: flex;
+  justify-content: space-around;
+}
 
-    .tile {
-      border: 1px solid #B8C6D0;
-      padding: 1.6rem;
-      border-radius: 1rem; }
-      .tile p {
-        margin-bottom: 0;
-        text-align: center; }
-        .tile img {
-          width: 5rem; }
+.tile {
+  border: 1px solid #B8C6D0;
+  padding: 1.6rem;
+  border-radius: 1rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Add transition for hover effect */
+}
+
+.tile:hover {
+  transform: scale(1.05); /* Slightly enlarge the tile on hover */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add shadow on hover */
+}
+
+.tile p {
+  margin-bottom: 0;
+  text-align: center;
+}
+
+.tile img {
+  width: 5rem;
+}

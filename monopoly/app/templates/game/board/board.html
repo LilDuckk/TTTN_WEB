@@ -4,6 +4,7 @@
     {% assets "scss_all" %}
         <link rel=stylesheet type=text/css href="{{ ASSET_URL }}">
     {% endassets %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/pages/board.css') }}">
     <script src="https://kit.fontawesome.com/047d79a93f.js" crossorigin="anonymous"></script>
 {% endblock %}
 
@@ -11,8 +12,14 @@
 
     <div id="board">
         {% include 'game/board/fields.html' %}
-
         {% include 'game/board/display.html' %}
+    </div>
+
+    <div id="field-info">
+        <h5 id="field-label"></h5>
+        <p id="field-price"></p>
+        <p id="field-owner"></p>
+        <ul id="field-pricing"></ul>
     </div>
 
     <div

@@ -19,11 +19,10 @@
             {% set fieldloop = loop %}
             {% for player in game.players %}
                 {% if player.current_field_id == fieldloop.index0 %}
-                    <div style="background-color: {{ player.color }}" class="player">{{ player.id }}</div>
+                    <div style="background-color: {{ player.color }};" class="player">{{ player.id }}</div>
                 {% endif %}
             {% endfor %}
         </div>
-
 
         {% if field.type == 'CITY' %}
             <div class="buildings">

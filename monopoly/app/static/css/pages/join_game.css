@@ -1,12 +1,39 @@
 form {
-  margin-top: 4rem; }
+  margin-top: 9rem; /* Adjusted margin-top for better positioning */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center the form */
+}
 
-  .btn {
-    display: flex;
-    align-items: center;
-    background-color: white;
-    border: 1px solid #B8C6D0;
-    padding: 0.6rem;
-    border-radius: 2.5rem;
-    font-size: 1.2rem;
-    color: #5f5f5f; }
+.form-group {
+  width: 100%;
+  max-width: 700px; /* Increase the max-width for larger form elements */
+  margin-bottom: 1.5rem; /* Add more space between form groups */
+  font-size: 1.5rem; /* Increase font size for better readability */
+}
+
+.form-control {
+  width: 100%; /* Make the input field take the full width of the form group */
+  padding: 1rem; /* Increase padding for larger input fields */
+  font-size: 1.3rem; /* Increase font size for input text */
+  border-radius: 0.5rem; /* Slightly round the input fields */
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Center the button text */
+  background-color: white;
+  border: 1px solid #B8C6D0;
+  padding: 0.8rem 1.5rem; /* Adjust padding for better appearance */
+  border-radius: 2.5rem;
+  font-size: 1.5rem; /* Increase font size for the button text */
+  color: #5f5f5f;
+  cursor: pointer; /* Change cursor to pointer on hover */
+  transition: background-color 0.3s ease; /* Add transition for hover effect */
+}
+
+.btn:hover {
+  color: aqua;
+  background-color: #f0f0f0; /* Change background color on hover */
+}

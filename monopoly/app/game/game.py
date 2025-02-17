@@ -3,7 +3,6 @@ from random import randint, choice
 from app.game.fields import *
 from app.game.surprises import SURPRISES
 
-
 class Player:
     colors = ['#ED553B', '#F6B55C', '#3CAEA3', '#20639B']
 
@@ -14,8 +13,21 @@ class Player:
         self.owned_fields = []
         self.color = self.colors[self.id]
         self.db_id = None
+        self.in_jail = False
+        self.jail_turns = 0
 
     def move(self, steps: int):
+        if self.in_jail:
+            if self.jail_turns < 2 and steps != 12:
+                self.jail_turns += 1
+                return 'Người chơi {} đang ở trong tù'.format(self.id)
+            elif steps == 12:
+                self.in_jail = False
+                self.jail_turns = 0
+                return 'Người chơi {} đã thoát khỏi tù bằng cách xúc xắc ra 12'.format(self.id)
+            else:
+                return 'Người chơi {} đang ở trong tù'.format(self.id)
+
         old_field_index = self.current_field_id
         if self.current_field_id + steps > len(FIELDS) - 1:
             self.current_field_id = self.current_field_id - len(FIELDS) - 2 + steps
@@ -27,6 +39,13 @@ class Player:
         if new_field_index < old_field_index:
             self.money += 300
 
+    def pay_to_get_out_of_jail(self):
+        if self.in_jail and self.money >= 300:
+            self.money -= 300
+            self.in_jail = False
+            self.jail_turns = 0
+            return 'Người chơi {} đã trả 300$ để thoát khỏi tù'.format(self.id)
+        return None
 
 class PlaceholderField:
     def __init__(self, data):
@@ -35,8 +54,7 @@ class PlaceholderField:
         self.type = data['type']
 
     def on_enter(self, player: Player, game):
-        return 'field {} has been stepped on by player {}'.format(self.id, player.id)
-
+        return 'Người chơi {} đã đi vào ô {}'.format(player.id, self.label)
 
 class PowerplantField:
     def __init__(self, data):
@@ -49,7 +67,7 @@ class PowerplantField:
     def on_enter(self, player: Player, game):
         if not self.owner and player.money > self.price:
             game.can_buy = True
-            return 'field {} can be bought by player {}'.format(self.id, player.id)
+            return 'Người chơi {} có thể mua ô {}'.format(player.id, self.label)
         if self.owner and self.owner != player:
             powerplants_count = len([f for f in self.owner.owned_fields if f.type == POWERPLANT])
             price = 10 * randint(2, 12)
@@ -57,8 +75,7 @@ class PowerplantField:
                 price = price * 2
             player.money -= price
             self.owner.money += price
-            return 'player{} just paid {}$ to player{}'.format(self.id, price, self.owner.id)
-
+            return 'Người chơi {} vừa trả {}$ cho người chơi{}'.format(self.id, price, self.owner.id)
 
 class TrainField:
     def __init__(self, data):
@@ -71,7 +88,7 @@ class TrainField:
     def on_enter(self, player: Player, game):
         if not self.owner and player.money > self.price:
             game.can_buy = True
-            return 'field {} can be bought by player {}'.format(self.id, player.id)
+            return 'Người chơi {} có thể mua ô {}'.format(player.id, self.label)
         if self.owner and self.owner != player:
             trains_count = len([f for f in self.owner.owned_fields if f.type == TRAIN])
             price = 50
@@ -79,8 +96,7 @@ class TrainField:
                 price = price * 2
             player.money -= price
             self.owner.money += price
-            return 'player{} just paid {}$ to player{}'.format(self.id, price, self.owner.id)
-
+            return 'Người chơi {} vừa trả {}$ cho người chơi {}'.format(self.id, price, self.owner.id)
 
 class SurpriseField:
     def __init__(self, data):
@@ -91,7 +107,6 @@ class SurpriseField:
     def on_enter(self, player: Player, game):
         return choice(SURPRISES)(player)
 
-
 class FineField:
     def __init__(self, data):
         self.id = data['id']
@@ -100,8 +115,7 @@ class FineField:
 
     def on_enter(self, player: Player, game):
         player.money -= 300
-        return 'player {} has lost 300$'.format(player.id)
-
+        return 'Người chơi {} bị phạt 300$'.format(player.id)
 
 class CityField:
     def __init__(self, data):
@@ -121,8 +135,29 @@ class CityField:
             price = self.pricing[self.build]
             player.money -= price
             self.owner.money += price
-        return 'field {} has been stepped on by player {}'.format(self.id, player.id)
+        return 'Người chơi {} đã đi vào ô {}'.format(player.id, self.label)
 
+class GotoField:
+    def __init__(self, data):
+        self.id = data['id']
+        self.label = data['label']
+        self.type = data['type']
+
+    def on_enter(self, player: Player, game):
+        player.current_field_id = next(field.id for field in game.board if field.type == PRISON)
+        player.in_jail = True
+        return 'Người chơi {} đã bị chuyển đến tù'.format(player.id)
+
+class JailField:
+    def __init__(self, data):
+        self.id = data['id']
+        self.label = data['label']
+        self.type = data['type']
+
+    def on_enter(self, player: Player, game):
+        if player.in_jail:
+            return 'Người chơi {} đang ở trong tù'.format(player.id)
+        return 'Người chơi {} đã đi vào ô {}'.format(player.id, self.label)
 
 class Game:
     def __init__(self, players_count: int, db_id: int = None):
@@ -149,7 +184,6 @@ class Game:
                 p.db_id = db_id
                 break
 
-
     def next_turn(self, payload):
         if payload['buy']:
             self._sell_field(self.players[self.current_player_index],
@@ -161,8 +195,16 @@ class Game:
         self._next_player()
         move = randint(2, 12)
         player = self.players[self.current_player_index]
-        player.move(move)
-        msg = self.board[player.current_field_id].on_enter(player, self)
+        self._add_message('Người chơi {} xúc xắc ra {}'.format(player.id, move))
+        if player.in_jail:
+            if 'pay_to_get_out' in payload and payload['pay_to_get_out'] == '1':
+                msg = player.pay_to_get_out_of_jail()
+            else:
+                msg = player.move(move)
+        else:
+            msg = player.move(move)
+        if not msg:
+            msg = self.board[player.current_field_id].on_enter(player, self)
         self._add_message(msg)
 
         self._check_finish()
@@ -211,6 +253,10 @@ class Game:
                 f = TrainField(field)
             elif field['type'] == POWERPLANT:
                 f = PowerplantField(field)
+            elif field['type'] == GOTO:
+                f = GotoField(field)
+            elif field['type'] == PRISON:
+                f = JailField(field)
             else:
                 f = PlaceholderField(field)
 

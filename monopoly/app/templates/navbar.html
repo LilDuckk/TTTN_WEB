@@ -4,13 +4,13 @@
     <nav>
         <ul>
             {% if current_user.is_authenticated %}
-               <li> <a class="nav-link" href="{{ url_for('auth.profile', user_id=current_user.id) }}">{{ current_user.username}}</a></li>
-                <li><a class="nav-link" href={{ url_for('game.menu') }}>new game</a></li>
-               <li> <a class="nav-link" href={{ url_for('game.join_game') }}>join game</a></li>
-               <li> <a class="nav-link" href={{ url_for('auth.logout') }}>logout</a></li>
+               <li> <a class="nav-link" style="color: rgb(255, 0, 0) !important;" href="{{ url_for('auth.profile', user_id=current_user.id) }}">{{ current_user.username}}</a></li>
+                <li><a class="nav-link" href={{ url_for('game.menu') }}>Game mới</a></li>
+               <li> <a class="nav-link" href={{ url_for('game.join_game') }}>Tham gia</a></li>
+               <li> <a class="nav-link" href={{ url_for('auth.logout') }}>Đăng xuất</a></li>
             {% else %}
-               <li> <a class="nav-link" href="{{ url_for('auth.register') }}">register</a></li>
-               <li> <a class="nav-link" href="{{ url_for('auth.login') }}">login</a></li>
+               <li> <a class="nav-link" href="{{ url_for('auth.register') }}">Đăng ký</a></li>
+               <li> <a class="nav-link" href="{{ url_for('auth.login') }}">Đăng nhập</a></li>
             {% endif %}
         </ul>
     </nav>

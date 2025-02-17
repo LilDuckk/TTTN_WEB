@@ -15,7 +15,7 @@ FIELDS = [
         'type': START
     }, {
         'id': 1,
-        'label': 'saloniki',
+        'label': 'Hà Nội',
         'type': CITY,
         'price': 120,
         'pricing': {
@@ -24,11 +24,11 @@ FIELDS = [
         'build_price': 100
     }, {
         'id': 2,
-        'label': '?',
+        'label': 'BỐC THẺ',
         'type': SECRET
     }, {
         'id': 3,
-        'label': 'ateny',
+        'label': 'Hải Phòng',
         'type': CITY,
         'price': 120,
         'pricing': {
@@ -37,15 +37,15 @@ FIELDS = [
         'build_price': 100
     }, {
         'id': 4,
-        'label': 'parking płatny',
+        'label': 'Phí đỗ xe',
         'type': FINE
     }, {
         'id': 5,
-        'label': 'kolej poł.',
+        'label': 'Ga Hà Nội',
         'type': TRAIN
     }, {
         'id': 6,
-        'label': 'neaopl',
+        'label': 'Đà Nẵng',
         'type': CITY,
         'price': 200,
         'pricing': {
@@ -54,11 +54,11 @@ FIELDS = [
         'build_price': 100
     }, {
         'id': 7,
-        'label': '?',
+        'label': 'BỐC THẺ',
         'type': SECRET
     }, {
         'id': 8,
-        'label': 'mediolan',
+        'label': 'Nha Trang',
         'type': CITY,
         'price': 200,
         'pricing': {
@@ -67,7 +67,7 @@ FIELDS = [
         'build_price': 100
     }, {
         'id': 9,
-        'label': 'rzym',
+        'label': 'Huế',
         'type': CITY,
         'price': 240,
         'pricing': {
@@ -76,11 +76,11 @@ FIELDS = [
         'build_price': 100
     }, {
         'id': 10,
-        'label': 'więzienie',
+        'label': 'Nhà tù',
         'type': PRISON
     }, {
         'id': 11,
-        'label': 'barcelona',
+        'label': 'Hội An',
         'type': CITY,
         'price': 280,
         'pricing': {
@@ -89,11 +89,11 @@ FIELDS = [
         'build_price': 200
     }, {
         'id': 12,
-        'label': 'elektrownia',
+        'label': 'Nhà máy điện',
         'type': POWERPLANT
     }, {
         'id': 13,
-        'label': 'sewila',
+        'label': 'Đà Lạt',
         'type': CITY,
         'price': 280,
         'pricing': {
@@ -102,7 +102,7 @@ FIELDS = [
         'build_price': 200
     }, {
         'id': 14,
-        'label': 'madryt',
+        'label': 'Cần Thơ',
         'type': CITY,
         'price': 320,
         'pricing': {
@@ -111,11 +111,11 @@ FIELDS = [
         'build_price': 200
     }, {
         'id': 15,
-        'label': 'kolej zach,',
+        'label': 'Ga Sài Gòn',
         'type': TRAIN
     }, {
         'id': 16,
-        'label': 'liverpool',
+        'label': 'Vũng Tàu',
         'type': CITY,
         'price': 360,
         'pricing': {
@@ -124,11 +124,11 @@ FIELDS = [
         'build_price': 200
     }, {
         'id': 17,
-        'label': '?',
+        'label': 'BẤT NGỜ',
         'type': SECRET
     }, {
         'id': 18,
-        'label': 'glosgow',
+        'label': 'Phú Quốc',
         'type': CITY,
         'price': 360,
         'pricing': {
@@ -137,7 +137,7 @@ FIELDS = [
         'build_price': 200
     }, {
         'id': 19,
-        'label': 'london',
+        'label': 'TP Hồ Chí Minh',
         'type': CITY,
         'price': 400,
         'pricing': {
@@ -146,11 +146,11 @@ FIELDS = [
         'build_price': 200
     }, {
         'id': 20,
-        'label': 'parking',
+        'label': 'Bãi đỗ xe',
         'type': PARKING
     }, {
         'id': 21,
-        'label': 'rotterdam',
+        'label': 'Hạ Long',
         'type': CITY,
         'price': 440,
         'pricing': {
@@ -159,11 +159,11 @@ FIELDS = [
         'build_price': 300
     }, {
         'id': 22,
-        'label': '?',
+        'label': 'BỐC THẺ',
         'type': SECRET
     }, {
         'id': 23,
-        'label': 'bruksela',
+        'label': 'Sapa',
         'type': CITY,
         'price': 440,
         'pricing': {
@@ -172,7 +172,7 @@ FIELDS = [
         'build_price': 300
     }, {
         'id': 24,
-        'label': 'amsterdam',
+        'label': 'Mũi Né',
         'type': CITY,
         'price': 480,
         'pricing': {
@@ -181,11 +181,11 @@ FIELDS = [
         'build_price': 300
     }, {
         'id': 25,
-        'label': 'kolej pół,',
+        'label': 'Ga Đà Nẵng',
         'type': TRAIN
     }, {
         'id': 26,
-        'label': 'malmo',
+        'label': 'Cà Mau',
         'type': CITY,
         'price': 520,
         'pricing': {
@@ -194,7 +194,7 @@ FIELDS = [
         'build_price': 300
     }, {
         'id': 27,
-        'label': 'goteborg',
+        'label': 'Buôn Ma Thuột',
         'type': CITY,
         'price': 520,
         'pricing': {
@@ -203,11 +203,11 @@ FIELDS = [
         'build_price': 300
     }, {
         'id': 28,
-        'label': 'wodociąg',
+        'label': 'Nhà máy nước',
         'type': POWERPLANT
     }, {
         'id': 29,
-        'label': 'sztokholm',
+        'label': 'Ninh Bình',
         'type': CITY,
         'price': 560,
         'pricing': {
@@ -216,11 +216,11 @@ FIELDS = [
         'build_price': 300
     }, {
         'id': 30,
-        'label': 'do więzienia',
+        'label': 'Đi tù',
         'type': GOTO
     }, {
         'id': 31,
-        'label': 'frankfurt',
+        'label': 'Vinh',
         'type': CITY,
         'price': 600,
         'pricing': {
@@ -229,7 +229,7 @@ FIELDS = [
         'build_price': 400
     }, {
         'id': 32,
-        'label': 'kolonia',
+        'label': 'Thanh Hóa',
         'type': CITY,
         'price': 600,
         'pricing': {
@@ -238,11 +238,11 @@ FIELDS = [
         'build_price': 400
     }, {
         'id': 33,
-        'label': '?',
+        'label': 'BẤT NGỜ',
         'type': SECRET
     }, {
         'id': 34,
-        'label': 'bonn',
+        'label': 'Quảng Ninh',
         'type': CITY,
         'price': 640,
         'pricing': {
@@ -251,15 +251,15 @@ FIELDS = [
         'build_price': 400
     }, {
         'id': 35,
-        'label': 'kolej wsch.',
+        'label': 'Ga Hải Phòng',
         'type': TRAIN
     }, {
         'id': 36,
-        'label': '?',
+        'label': 'BỐC THẺ',
         'type': SECRET
     }, {
         'id': 37,
-        'label': 'insbruck',
+        'label': 'Bình Định',
         'type': CITY,
         'price': 700,
         'pricing': {
@@ -268,11 +268,11 @@ FIELDS = [
         'build_price': 400
     }, {
         'id': 38,
-        'label': 'podatek',
+        'label': 'Thuế',
         'type': FINE
     }, {
         'id': 39,
-        'label': 'wiedeń',
+        'label': 'Quảng Nam',
         'type': CITY,
         'price': 800,
         'pricing': {

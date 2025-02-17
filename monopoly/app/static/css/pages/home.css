@@ -36,7 +36,12 @@
       padding: 0.6rem;
       border-radius: 2.5rem;
       font-size: 1.2rem;
-      color: #5f5f5f; }
+      color: #5f5f5f;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      cursor: pointer; }
+      .start-btn:hover {
+        background-color: #f0f0f0;
+        color: #333; }
       .start-btn .icon-box {
         background-color: #41c73c;
         box-shadow: 0px 0px 4px 1px #41c73c;

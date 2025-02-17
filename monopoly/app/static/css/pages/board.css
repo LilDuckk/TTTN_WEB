@@ -1,0 +1,102 @@
+#board {
+  display: grid;
+  grid-template-columns: repeat(11, 1fr); /* Create a grid with 11 columns */
+  grid-template-rows: repeat(11, 1fr); /* Create a grid with 11 rows */
+  gap: 0; /* Remove gaps between grid items */
+  width: 100%;
+  max-width: 1000px; /* Set a maximum width for the board */
+  margin: 20px auto 0; /* Add margin-top to move the board down */
+  border: 2px solid #333; /* Add a border around the board */
+}
+
+#board .cell {
+  border: 1px solid #B8C6D0; /* Add a border to each cell */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
+  cursor: pointer; /* Change cursor to pointer on hover */
+}
+
+.tile {
+  cursor: pointer; /* Change cursor to pointer on hover */
+}
+
+.tile:hover {
+  background-color: #d48989 !important; /* Change background color on hover */
+}
+
+#board .cell img {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+header nav ul li:not(:first-child) {
+  display: none; /* Hide all links except the first one (Home) */
+}
+
+#field-info {
+  display: none;
+  position: absolute;
+  background-color: white;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  font-family: 'Arial', sans-serif; /* Set font to Arial for Vietnamese support */
+}
+
+#field-info h5 {
+  margin: 0 0 10px 0;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+#field-info p {
+  margin: 5px 0;
+  font-size: 1rem;
+  color: #555;
+}
+
+#field-info ul {
+  padding-left: 20px;
+  margin: 10px 0 0 0;
+  list-style-type: disc;
+}
+
+#field-info ul li {
+  margin: 5px 0;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+input[type="submit"] {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 0.5rem;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+input[type="submit"]:hover {
+  background-color: #0056b3;
+}
+
+.buy_radio {
+  margin-right: 0.5rem; /* Add space between radio button and label text */
+}
+
+label {
+  font-size: 1.2rem;
+  margin-right: 1rem; /* Add space between labels */
+  cursor: pointer; /* Change cursor to pointer on hover */
+}
+
+label:hover {
+  color: #007bff; /* Change label color on hover */
+}

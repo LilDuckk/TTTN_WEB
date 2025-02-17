@@ -20,16 +20,16 @@
                         <img src="{{url_for('static', filename='images/users-solid.svg')}}" alt="people">
                         <span>
                         {% if users_count <= 100 %}
-                            +100
+                            +10
                         {% else %}
                             {{users_count}}
                         {% endif %}
                         </span>
-                        <div>registered players</div>
+                        <div>Số người đăng ký</div>
                     </div>
                     <div>
                         <button class="start-btn" data-url="{% if current_user.is_authenticated %}{{ url_for('game.menu') }}{% else %}{{ url_for('auth.login') }}{% endif %}">
-                                Are you ready?
+                                Bắt đầu chơi
                                 <div class="icon-box">
                                     <img src="{{ url_for('static', filename='images/play-solid.svg') }}" alt="play icon">
                                 </div>
