@@ -13,6 +13,7 @@
                {% for game in user.games %}
                     {% if game.status == 'STATUS_ACTIVE' %}
                     <li class="game">
+                        <div class="game-item">
                             {% if game.mode == 'HOT_SEATS_MODE' %}
                                 <a href="{{url_for('game.hot_seats', code=game.code)}}">
                             {% endif %}
@@ -32,7 +33,12 @@
                             {% if game.mode == 'PVAI_MODE' %}
                                 Đấu máy
                             {% endif %}
-                        </a>
+                           <form action="{{ url_for('game.delete_game_route', code=game.code) }}" method="post" class="delete-form">
+                                <button type="submit" class="btn btn-danger btn-sm">Xóa</button>
+                            </form>
+                            </a>
+                             
+                        </div>
                     </li>
                     {% endif %}
                {% endfor %}

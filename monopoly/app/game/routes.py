@@ -32,7 +32,8 @@ def menu():
 def hot_seats(code=None):
     payload = {
         'buy': bool(int(request.form.get('buy'))) if request.form.get('buy') else None,
-        'build': request.form.get('build').split(';')[0:-1] if request.form.get('build') else None
+        'build': request.form.get('build').split(';')[0:-1] if request.form.get('build') else None,
+        'pay_to_get_out': request.form.get('pay_to_get_out') if request.form.get('pay_to_get_out') else None
     }
     if code:
         if request.form.get('next_turn'):
@@ -44,7 +45,7 @@ def hot_seats(code=None):
                 db.session.commit()
                 delete_game(code)
 
-                flash('player {} have won!!'.format(g.winner.id), 'success')
+                flash('Người chơi {} đã thắng!!'.format(g.winner.id), 'success')
                 return redirect(url_for('game.home'))
             save_game(g, code)
         else:
@@ -81,7 +82,8 @@ def field_info(field_id):
 def vs_ai(code=None):
     payload = {
         'buy': bool(int(request.form.get('buy'))) if request.form.get('buy') else None,
-        'build': request.form.get('build').split(';')[0:-1] if request.form.get('build') else None
+        'build': request.form.get('build').split(';')[0:-1] if request.form.get('build') else None,
+        'pay_to_get_out': request.form.get('pay_to_get_out') if request.form.get('pay_to_get_out') else None
     }
     if code:
         if request.form.get('next_turn'):
@@ -94,7 +96,7 @@ def vs_ai(code=None):
                 game_record.status = STATUS_FINISHED
                 db.session.commit()
                 delete_game(code)
-                flash('player {} have won!!'.format(g.winner.id), 'success')
+                flash('Người chơi {} đã thắng!!'.format(g.winner.id), 'success')
                 return redirect(url_for('game.home'))
             save_game(g, code)
         else:
@@ -136,7 +138,7 @@ def waiting_room(code):
             db.session.commit()
             return redirect(url_for('game.play_pvp', code=code))
         else:
-            flash('You can not start the game, no player has joined.', 'danger')
+            flash('Bạn chưa thể bắt đầu trò chơi, chưa có người chơi nào gia nhập phòng.', 'danger')
 
     return render_template('game/waiting_room.html', code=code, is_host=True)
 
@@ -157,7 +159,7 @@ def join_game():
             db.session.commit()
             return redirect(url_for('game.guest_waiting_room', code=code))
         else:
-            flash('you can not join this game.', 'danger')
+            flash('Bạn không thể tham gia phòng chơi này', 'danger')
 
     return render_template('game/join_game.html', form=form)
 
@@ -169,7 +171,7 @@ def guest_waiting_room(code):
         if game_record.status == STATUS_ACTIVE:
             return redirect(url_for('game.play_pvp', code=code))
 
-    flash('now, wait for host to start the game.', 'primary')
+    flash('Hãy chờ chủ phòng bắt đầu', 'primary')
     return render_template('game/waiting_room.html', is_host=False)
 
 
@@ -177,7 +179,8 @@ def guest_waiting_room(code):
 def play_pvp(code):
     payload = {
         'buy': bool(int(request.form.get('buy'))) if request.form.get('buy') else None,
-        'build': request.form.get('build').split(';')[0:-1] if request.form.get('build') else None
+        'build': request.form.get('build').split(';')[0:-1] if request.form.get('build') else None,
+        'pay_to_get_out': request.form.get('pay_to_get_out') if request.form.get('pay_to_get_out') else None
     }
     g = load_game(code)
     if g.winner:
@@ -193,7 +196,7 @@ def play_pvp(code):
             game_record.status = STATUS_FINISHED
             db.session.commit()
             socketio.emit('gameover', data={'msg': '{} won.'.format('You have' if current_user.id == g.winner.db_id else 'Enemy has')})
-            flash('{} won.'.format('Enemy has' if current_user.id == g.winner.db_id else 'You have'))
+            flash('Người chơi {} đã thắng!!'.format(g.winner.username), 'success')
             return redirect(url_for('game.home'))
         save_game(g, code)
         socketio.emit('refresh', data={'last_player': last_player}, broadcast=True)
@@ -206,6 +209,19 @@ def play_pvp(code):
         pvp=True,
         is_active=is_active
         )
+
+
+@game.route('/delete_game/<code>', methods=['POST'])
+def delete_game_route(code):
+    game_record = GameModel.query.filter_by(code=code).first()
+    if game_record:
+        delete_game(code)
+        db.session.delete(game_record)
+        db.session.commit()
+        flash('Trò chơi đã được xóa.', 'success')
+    else:
+        flash('Không tìm thấy trò chơi.', 'danger')
+    return redirect(url_for('auth.profile', user_id=current_user.id))
 
 
 @socketio.on('join')

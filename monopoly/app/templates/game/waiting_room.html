@@ -4,7 +4,7 @@
 {% block css%}
 {% assets "waiting_room_scss" %}
 <link rel=stylesheet type=text/css href="{{ ASSET_URL }}">
-{% endassets %}
+{% endassets %} 
 {% endblock %}
 
 
@@ -12,14 +12,14 @@
 <div class="container">
     <div class="content">
         {% if is_host %}
-        <p>join code - send this to person you want to play with</p>
+        <p>Mã tham gia - Gửi mã cho bạn bè của bạn tham gia phòng</p>
         <h2>
             <span class="code">{{ code }}</span>
             <img class="copy-icon" src="{{url_for('static', filename='images/copy-solid.svg')}}" alt="copy">
         </h2>
         <form method="POST">
             <!-- <input type="submit" value="start game" class="start-btn"> -->
-            <button type="submit" class="start-btn">start game
+            <button type="submit" class="start-btn">Bắt đầu
                 <div class="icon-box">
                     <img src="{{url_for('static', filename='images/play-solid.svg')}}" alt="play icon">
                 </div>
@@ -27,15 +27,28 @@
         </form>
         {% else %}
         <form method="POST">
-            <input type="submit" value="play" class="btn btn-primary">
+            <button type="submit" class="btn btn-primary tham-gia-btn">Tham gia
+            <div class="icon-box">
+                <img src="{{url_for('static', filename='images/play-solid.svg')}}" alt="play icon">
+            </div>
+            </button>
         </form>
         {% endif %}
     </div>
 </div>
+<div id="copy-notification" style="display: none; position: fixed; bottom: 20px; right: 20px; background-color: #28a745; color: white; padding: 10px; border-radius: 5px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+    Đã copy mã phòng!
+</div>
 <script>
     document.querySelector('.copy-icon').addEventListener('click', e => {
         const code = document.querySelector('.code').textContent;
-        navigator.clipboard.writeText(code);
-    })
+        navigator.clipboard.writeText(code).then(() => {
+            const notification = document.getElementById('copy-notification');
+            notification.style.display = 'block';
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 2000);
+        });
+    });
 </script>
 {% endblock %}

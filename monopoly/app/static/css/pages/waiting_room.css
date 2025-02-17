@@ -1,5 +1,6 @@
 .content {
-  margin-top: 4rem; }
+  margin-top: 4rem;
+  padding-top: 3rem; }
 
   .copy-icon {
     height: 1rem;
@@ -9,12 +10,18 @@
     .start-btn {
       display: flex;
       align-items: center;
+      justify-content: space-between;
       background-color: white;
       border: 1px solid #B8C6D0;
       padding: 0.6rem;
       border-radius: 2.5rem;
       font-size: 1.2rem;
-      color: #5f5f5f; }
+      color: #5f5f5f;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      cursor: pointer; }
+      .start-btn:hover {
+        background-color: #f0f0f0;
+        color: #333; }
       .start-btn .icon-box {
         background-color: #41c73c;
         box-shadow: 0px 0px 4px 1px #41c73c;
@@ -28,3 +35,34 @@
         .start-btn .icon-box img {
           color: white;
           height: 1.2rem; }
+
+.btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #007bff;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 0.5rem;
+  font-size: 1.5rem;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+  transform: scale(1.05);
+}
+
+.icon-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0.5rem;
+}
+
+.icon-box img {
+  width: 1.5rem;
+  height: 1.5rem;
+}

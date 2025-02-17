@@ -100,3 +100,46 @@ label {
 label:hover {
   color: #007bff; /* Change label color on hover */
 }
+
+.flex-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.left-panel {
+  margin-top: 5rem;
+  flex: 1;
+}
+
+.cash {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid #000;
+  border-radius: 10px;
+  background-color: #f9f9f9;
+}
+
+.msgs {
+  margin-top: 5rem;
+  width: 40%;
+  height: fit-content;
+  border: 1px solid #000000;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.submit-container {
+  padding-bottom: 10rem; /* Add more space between submit-container and game_form */
+}
+
+#game_form {
+  min-height: 100px; /* Set a minimum height to prevent resizing */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.conditional-container {
+  min-height: 100px; /* Set a minimum height to prevent resizing */
+}
+

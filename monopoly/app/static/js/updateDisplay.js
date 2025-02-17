@@ -15,7 +15,7 @@
                     const fieldPricing = document.getElementById('field-pricing');
 
                     fieldLabel.textContent = `Ô: ${json.label}`;
-                    
+                    fieldOwner.textContent = `Owner: ${json.owner ? json.owner.id : 'None'}`;
 
                     if (json.type === 'CITY') {
                         fieldPrice.textContent = `Price: ${json.price || 'N/A'}$`;
@@ -39,7 +39,6 @@
                         fieldPricing.innerHTML = '';
                     } else {
                         fieldPrice.textContent = '';
-                        fieldOwner.textContent = '';
                         fieldPricing.innerHTML = '';
                     }
 
