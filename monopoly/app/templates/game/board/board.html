@@ -10,12 +10,12 @@
 
 {% block body %}
 
-    <div id="board">
+    <div id="board" class="no-select">
         {% include 'game/board/fields.html' %}
         {% include 'game/board/display.html' %}
     </div>
 
-    <div id="field-info">
+    <div id="field-info" class="no-select">
         <h5 id="field-label"></h5>
         <p id="field-price"></p>
         <p id="field-owner"></p>

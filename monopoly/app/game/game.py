@@ -36,6 +36,9 @@ class Player:
         old_field_index = self.current_field_id
         if self.current_field_id + steps > len(FIELDS) - 1:
             self.current_field_id = self.current_field_id - len(FIELDS) - 2 + steps
+            self.money += 300  # Thêm tiền khi đi qua ô start
+            for field in self.owned_fields:
+                field.passed_start_since_purchase = True  # Đặt thành True khi đi qua ô start
         else:
             self.current_field_id += steps
         print(self.current_field_id)
@@ -127,6 +130,7 @@ class CityField:
         self.pricing = data['pricing']
         self.owner = None
         self.build = '0'
+        self.passed_start_since_purchase = False  # Thêm thuộc tính này
 
     def on_enter(self, player: Player, game):
         if not self.owner and player.money > self.price:
@@ -135,6 +139,8 @@ class CityField:
             price = self.pricing[self.build]
             player.money -= price
             self.owner.money += price
+        if self.owner == player:
+            self.passed_start_since_purchase = True  # Đặt thành True khi người chơi đi qua ô đất
         return '{} đã đi vào ô {}'.format(player.display_name(), self.label)
 
 class GotoField:
@@ -190,7 +196,6 @@ class Game:
                 break
 
     def next_turn(self, payload):
-        
         if payload['buy']:
             self._sell_field(self.players[self.current_player_index],
                              self.board[self.players[self.current_player_index].current_field_id])
@@ -203,7 +208,7 @@ class Game:
         move = randint(2, 12)
         player = self.players[self.current_player_index]
         self._add_message('{} xúc xắc ra {}'.format(player.display_name(), move))
-        if player.in_jail == True:
+        if player.in_jail:
             if payload['pay_to_get_out'] == '1':
                 self.pay_to_get_out_of_jail()
             else:
@@ -233,6 +238,11 @@ class Game:
         field_id = int(field_id)
         for field in self.board:
             if field.id == field_id:
+                if field.owner != self.players[self.current_player_index]:
+                    continue  # Chỉ cho phép nâng cấp nếu người chơi sở hữu ô đất
+                if not field.passed_start_since_purchase:
+                    self._add_message('{} chưa thể nâng cấp ô {} vì chưa đi qua ô start kể từ khi mua'.format(field.owner.display_name(), field.label))
+                    continue  # Chỉ cho phép nâng cấp nếu đã đi qua ô start kể từ khi mua
                 if field.build == '4': field.build = 'h'
                 if field.build == '3': field.build = '4'
                 if field.build == '2': field.build = '3'
@@ -240,11 +250,15 @@ class Game:
                 if field.build == '0': field.build = '1'
 
                 field.owner.money -= field.build_price
+                field.passed_start_since_purchase = False  # Đặt lại thành False sau khi nâng cấp
+                self._add_message('{} đã nâng cấp ô {}'.format(field.owner.display_name(), field.label))
 
     def _sell_field(self, player: Player, field: Union[CityField, TrainField]):
         player.money -= field.price
         player.owned_fields.append(field)
         field.owner = player
+        field.passed_start_since_purchase = False  # Đặt lại thành False khi mua ô đất
+        self._add_message('{} đã mua ô {}'.format(player.display_name(), field.label))
 
     def _add_message(self, msg):
         self.msgs.append(msg)

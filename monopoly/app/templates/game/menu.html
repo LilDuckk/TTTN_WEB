@@ -1,27 +1,60 @@
 {% extends 'layout.html' %}
 
-{% block css%}
+{% block css %}
     {% assets "menu_scss" %}
     <link rel=stylesheet type=text/css href="{{ ASSET_URL }}">
     {% endassets %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.tile').forEach(function(tile) {
+                tile.addEventListener('click', function(event) {
+                    if (this.parentElement.classList.contains('dropdown-container')) {
+                        event.preventDefault();
+                        this.parentElement.classList.toggle('active');
+                    }
+                });
+            });
+
+            document.addEventListener('click', function(event) {
+                if (!event.target.closest('.dropdown-container')) {
+                    document.querySelectorAll('.dropdown-container').forEach(function(container) {
+                        container.classList.remove('active');
+                    });
+                }
+            });
+        });
+    </script>
 {% endblock %}
 
 {% block body %}
     <div class="container">
         <h2>Chọn chế độ chơi</h2>
-            <div class="modes-container">
-                <a class="tile" href="{{ url_for('game.hot_seats') }}">
+        <div class="modes-container">
+            <div class="dropdown-container">
+                <a class="tile" href="#">
                     <img src="{{url_for('static', filename='images/user-group-solid.svg')}}" alt="people">
                     <p>Đấu nhanh</p>
                 </a>
-                <a class="tile" href="{{ url_for('game.vs_ai') }}">
-                    <img src="{{url_for('static', filename='images/robot-solid.svg')}}" alt="people">
-                    <p>Đấu với máy</p>
-                </a>
-                <a class="tile" href="{{ url_for('game.init_pvp') }}">
-                    <img src="{{url_for('static', filename='images/globe-solid.svg')}}" alt="people">
-                    <p>Chơi Online</p>
-                </a>
+                <div class="dropdown-content">
+                    <form action="{{ url_for('game.hot_seats') }}" method="get">
+                        <label for="num_players">Số lượng người chơi:</label>
+                        <select name="num_players" id="num_players">
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                        </select>
+                        <button type="submit">Bắt đầu trò chơi</button>
+                    </form>
+                </div>
             </div>
+            <a class="tile" href="{{ url_for('game.vs_ai') }}">
+                <img src="{{url_for('static', filename='images/robot-solid.svg')}}" alt="people">
+                <p>Đấu với máy</p>
+            </a>
+            <a class="tile" href="{{ url_for('game.init_pvp') }}">
+                <img src="{{url_for('static', filename='images/globe-solid.svg')}}" alt="people">
+                <p>Chơi Online</p>
+            </a>
+        </div>
     </div>
 {% endblock %}

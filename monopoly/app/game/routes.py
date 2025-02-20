@@ -27,9 +27,14 @@ def menu():
     return render_template('game/menu.html')
 
 
-@game.route('/hot_seats')
+@game.route('/hot_seats', methods=['POST', 'GET'])
 @game.route('/hot_seats/<code>', methods=['POST', 'GET'])
 def hot_seats(code=None):
+    num_players = int(request.args.get('num_players', 2))  # Lấy số lượng người chơi từ tham số URL, mặc định là 2
+    if num_players < 2 or num_players > 4:
+        flash('Số lượng người chơi phải từ 2 đến 4.', 'danger')
+        return redirect(url_for('game.menu'))
+
     payload = {
         'buy': bool(int(request.form.get('buy'))) if request.form.get('buy') else None,
         'build': request.form.get('build').split(';')[0:-1] if request.form.get('build') else None,
@@ -52,7 +57,7 @@ def hot_seats(code=None):
             g = load_game(code)
     else:
         code = token_hex(16)
-        g = Game(2)
+        g = Game(num_players)  # Sử dụng số lượng người chơi được chọn
         g.next_turn(payload)
         save_game(g, code)
 

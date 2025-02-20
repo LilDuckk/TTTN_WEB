@@ -15,7 +15,7 @@ flask create_db
 python main.py 
 
 
-Codespace
+#Với Codespace
 
 #cài đặt pyenv để thay đổi phiên bản python 
 curl https://pyenv.run | bash
